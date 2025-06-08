@@ -1,20 +1,26 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { NotificationsModule } from './notifications/notifications.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      url: process.env.DATABASE_URL,  // Usa la variable de entorno si existe
       port: 5432,
-      username: 'postgres',
-      password: 'adara2014',
-      database: 'notification_db',
+      username: process.env.DB_USERNAME || 'postgres', // mejor usar variables entorno
+      password: process.env.DB_PASSWORD || 'adara2014',
+      database: process.env.DB_NAME || 'notification_db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
-    NotificationsModule, 
+    NotificationsModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
